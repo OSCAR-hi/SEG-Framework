@@ -21,39 +21,47 @@ namespace TbsFramework.Units
     public class Unit : MonoBehaviour
     {
         Dictionary<Cell, IList<Cell>> cachedPaths = null;
+
         /// <summary>
         /// UnitClicked event is invoked when user clicks the unit. 
         /// It requires a collider on the unit game object to work.
         /// </summary>
         public event EventHandler UnitClicked;
+
         /// <summary>
         /// UnitSelected event is invoked when user clicks on unit that belongs to him. 
         /// It requires a collider on the unit game object to work.
         /// </summary>
         public event EventHandler UnitSelected;
+
         /// <summary>
         /// UnitDeselected event is invoked when user click outside of currently selected unit's collider.
         /// It requires a collider on the unit game object to work.
         /// </summary>
         public event EventHandler UnitDeselected;
+
         /// <summary>
         /// UnitHighlighted event is invoked when user moves cursor over the unit. 
         /// It requires a collider on the unit game object to work.
         /// </summary>
         public event EventHandler UnitHighlighted;
+
         /// <summary>
         /// UnitDehighlighted event is invoked when cursor exits unit's collider. 
         /// It requires a collider on the unit game object to work.
         /// </summary>
         public event EventHandler UnitDehighlighted;
+
         /// <summary>
         /// UnitAttacked event is invoked when the unit is attacked.
         /// </summary>
         public event EventHandler<AttackEventArgs> UnitAttacked;
+
         /// <summary>
         /// UnitDestroyed event is invoked when unit's hitpoints drop below 0.
         /// </summary>
         public event EventHandler<AttackEventArgs> UnitDestroyed;
+
         /// <summary>
         /// UnitMoved event is invoked when unit moves from one cell to another.
         /// </summary>
@@ -85,6 +93,7 @@ namespace TbsFramework.Units
         {
             UnitState.MakeTransition(state);
         }
+
         /// <summary>
         /// A list of buffs that are applied to the unit.
         /// </summary>
@@ -121,6 +130,7 @@ namespace TbsFramework.Units
         public int AttackRange;
         public int AttackFactor;
         public int DefenceFactor;
+
         /// <summary>
         /// Determines how far on the grid the unit can move.
         /// </summary>
@@ -137,10 +147,12 @@ namespace TbsFramework.Units
                 movementPoints = value;
             }
         }
+
         /// <summary>
         /// Determines speed of movement animation.
         /// </summary>
         public float MovementAnimationSpeed;
+
         /// <summary>
         /// Determines how many attacks unit can perform in one turn.
         /// </summary>
@@ -193,6 +205,7 @@ namespace TbsFramework.Units
                 UnitClicked.Invoke(this, EventArgs.Empty);
             }
         }
+
         public virtual void OnMouseEnter()
         {
             if (UnitHighlighted != null)
@@ -200,6 +213,7 @@ namespace TbsFramework.Units
                 UnitHighlighted.Invoke(this, EventArgs.Empty);
             }
         }
+
         public virtual void OnMouseExit()
         {
             if (UnitDehighlighted != null)
@@ -221,6 +235,7 @@ namespace TbsFramework.Units
             var state = UnitState;
             SetState(new UnitStateMarkedAsFriendly(this));
         }
+
         /// <summary>
         /// Method is called at the end of each turn.
         /// </summary>
@@ -237,6 +252,7 @@ namespace TbsFramework.Units
 
             SetState(new UnitStateNormal(this));
         }
+
         /// <summary>
         /// Method is called when units HP drops below 1.
         /// </summary>
@@ -262,6 +278,7 @@ namespace TbsFramework.Units
                 UnitSelected.Invoke(this, EventArgs.Empty);
             }
         }
+
         /// <summary>
         /// Method is called when unit is deselected.
         /// </summary>
@@ -294,7 +311,6 @@ namespace TbsFramework.Units
                 && ActionPoints >= 1;
         }
 
-
         /// <summary>
         /// Method performs an attack on given unit.
         /// </summary>
@@ -305,6 +321,7 @@ namespace TbsFramework.Units
             unitToAttack.DefendHandler(this, attackAction.Damage);
             AttackActionPerformed(attackAction.ActionCost);
         }
+
         /// <summary>
         /// Method for calculating damage and action points cost of attacking given unit
         /// </summary>
@@ -347,6 +364,7 @@ namespace TbsFramework.Units
                 OnDestroyed();
             }
         }
+
         /// <summary>
         /// Method for calculating actual damage taken by the unit.
         /// </summary>
@@ -357,6 +375,7 @@ namespace TbsFramework.Units
         {
             return Mathf.Clamp(damage - DefenceFactor, 1, damage);
         }
+
         /// <summary>
         /// Method callef after unit performed defence.
         /// </summary>
@@ -396,11 +415,9 @@ namespace TbsFramework.Units
                 OnMoveFinished();
             }
 
-            if (UnitMoved != null)
-            {
-                UnitMoved.Invoke(this, new MovementEventArgs(Cell, destinationCell, path, this));
-            }
+            UnitMoved?.Invoke(this, new MovementEventArgs(Cell, destinationCell, path, this));
         }
+
         protected virtual IEnumerator MovementAnimation(IList<Cell> path)
         {
             for (int i = path.Count - 1; i >= 0; i--)
@@ -416,6 +433,7 @@ namespace TbsFramework.Units
 
             OnMoveFinished();
         }
+
         /// <summary>
         /// Method called after movement animation has finished.
         /// </summary>
@@ -428,6 +446,7 @@ namespace TbsFramework.Units
         {
             return !cell.IsTaken;
         }
+
         /// <summary>
         /// Method indicates if unit is capable of moving through cell given as parameter.
         /// </summary>
@@ -435,6 +454,7 @@ namespace TbsFramework.Units
         {
             return !cell.IsTaken;
         }
+        
         /// <summary>
         /// Method returns all cells that the unit is capable of moving to.
         /// </summary>
@@ -448,7 +468,7 @@ namespace TbsFramework.Units
             var availableDestinations = new HashSet<Cell>();
             foreach (var cell in cells.Where(c => IsCellMovableTo(c)))
             {
-                if(cachedPaths.TryGetValue(cell, out var path))
+                if (cachedPaths.TryGetValue(cell, out var path))
                 {
                     var pathCost = path.Sum(c => c.MovementCost);
                     if (pathCost <= MovementPoints)
@@ -475,6 +495,7 @@ namespace TbsFramework.Units
             }
             return new List<Cell>();
         }
+        
         /// <summary>
         /// Method returns graph representation of cell grid for pathfinding.
         /// </summary>
@@ -488,7 +509,7 @@ namespace TbsFramework.Units
                     ret[cell] = new Dictionary<Cell, float>();
                     foreach (var neighbour in cell.GetNeighbours(cells))
                     {
-                        if(IsCellTraversable(neighbour) || IsCellMovableTo(neighbour))
+                        if (IsCellTraversable(neighbour) || IsCellMovableTo(neighbour))
                         {
                             ret[cell][neighbour] = neighbour.MovementCost;
                         }
@@ -511,6 +532,7 @@ namespace TbsFramework.Units
                 UnitHighlighterAggregator.MarkAsDefendingFn?.ForEach(o => o.Apply(this, aggressor));
             }
         }
+
         /// <summary>
         /// Gives visual indication that the unit is attacking.
         /// </summary>
@@ -524,6 +546,7 @@ namespace TbsFramework.Units
                 UnitHighlighterAggregator.MarkAsAttackingFn?.ForEach(o => o.Apply(this, target));
             }
         }
+
         /// <summary>
         /// Gives visual indication that the unit is destroyed. It gets called right before the unit game object is
         /// destroyed.
@@ -546,6 +569,7 @@ namespace TbsFramework.Units
                 UnitHighlighterAggregator.MarkAsFriendlyFn?.ForEach(o => o.Apply(this, null));
             }
         }
+
         /// <summary>
         /// Method mark units to indicate user that the unit is in range and can be attacked.
         /// </summary>
@@ -556,6 +580,7 @@ namespace TbsFramework.Units
                 UnitHighlighterAggregator.MarkAsReachableEnemyFn?.ForEach(o => o.Apply(this, null));
             }
         }
+
         /// <summary>
         /// Method marks unit as currently selected, to distinguish it from other units.
         /// </summary>
@@ -566,6 +591,7 @@ namespace TbsFramework.Units
                 UnitHighlighterAggregator.MarkAsSelectedFn?.ForEach(o => o.Apply(this, null));
             }
         }
+
         /// <summary>
         /// Method marks unit to indicate user that he can't do anything more with it this turn.
         /// </summary>
@@ -576,6 +602,7 @@ namespace TbsFramework.Units
                 UnitHighlighterAggregator.MarkAsFinishedFn?.ForEach(o => o.Apply(this, null));
             }
         }
+
         /// <summary>
         /// Method returns the unit to its base appearance
         /// </summary>
@@ -586,6 +613,7 @@ namespace TbsFramework.Units
                 UnitHighlighterAggregator.UnMarkFn?.ForEach(o => o.Apply(this, null));
             }
         }
+
         public virtual void SetColor(Color color) { }
 
         [ExecuteInEditMode]
@@ -654,6 +682,7 @@ namespace TbsFramework.Units
             Unit = unit;
         }
     }
+
     public class AttackEventArgs : EventArgs
     {
         public Unit Attacker;
@@ -669,6 +698,7 @@ namespace TbsFramework.Units
             Damage = damage;
         }
     }
+    
     public class UnitCreatedEventArgs : EventArgs
     {
         public Transform unit;
