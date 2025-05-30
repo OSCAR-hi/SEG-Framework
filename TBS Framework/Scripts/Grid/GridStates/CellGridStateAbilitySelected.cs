@@ -41,6 +41,7 @@ namespace TbsFramework.Grid.GridStates
         public override void OnCellClicked(Cell cell)
         {
             _abilities.ForEach(a => a.OnCellClicked(cell, _cellGrid));
+            Debug.Log("CellGridStateAbilitySelected: OnCellClicked");
         }
         public override void OnCellSelected(Cell cell)
         {

@@ -272,6 +272,7 @@ namespace TbsFramework.Units
             if (FindObjectOfType<CellGrid>().GetCurrentPlayerUnits().Contains(this))
             {
                 SetState(new UnitStateMarkedAsSelected(this));
+                Debug.Log("Unit: OnUnitSelected");
             }
             if (UnitSelected != null)
             {
@@ -396,6 +397,7 @@ namespace TbsFramework.Units
         /// <param name="path">A list of cells, path from source to destination cell</param>
         public virtual IEnumerator Move(Cell destinationCell, IList<Cell> path)
         {
+            Debug.Log("Unit: Move");
             var totalMovementCost = path.Sum(h => h.MovementCost);
             MovementPoints -= totalMovementCost;
 

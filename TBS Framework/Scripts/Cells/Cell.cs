@@ -69,6 +69,7 @@ namespace TbsFramework.Cells
         {
             if (CellClicked != null)
                 CellClicked.Invoke(this, EventArgs.Empty);
+                Debug.Log("Cell : Mouse Down");
         }
 
         /// <summary>

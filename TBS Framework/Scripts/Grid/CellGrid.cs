@@ -182,6 +182,7 @@ namespace TbsFramework.Grid
         private void OnCellClicked(object sender, EventArgs e)
         {
             cellGridState.OnCellClicked(sender as Cell);
+            Debug.Log("CellGrid : OnCellClicked");
         }
 
         private void OnUnitClicked(object sender, EventArgs e)
